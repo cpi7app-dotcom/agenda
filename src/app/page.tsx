@@ -1,9 +1,7 @@
+import { redirect } from "next/navigation";
+
 export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 font-sans">
-      <h1 className="text-3xl font-bold tracking-tight text-pm-blue">
-        Agenda de Troca de Funcionais
-      </h1>
-    </div>
-  );
+  // Redireciona a página principal direto para o dashboard,
+  // o que fará com que o Clerk automaticamente exija o login se o usuário não estiver autenticado.
+  redirect("/dashboard");
 }
