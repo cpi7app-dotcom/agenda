@@ -9,6 +9,7 @@ import { ClipboardList } from "lucide-react";
 import { DialogCancelarPeriodo } from "@/components/dashboard/admin/dialog-cancelar-periodo";
 import { ListaBloqueios } from "@/components/dashboard/admin/lista-bloqueios";
 import { getBloqueiosAtivos } from "@/server/actions/cancelamento-massa";
+import { DialogRelatorio } from "@/components/dashboard/admin/dialog-relatorio";
 
 export default async function AdminAgendamentosPage() {
     const meuPerfil = await getPerfilUsuario();
@@ -33,7 +34,10 @@ export default async function AdminAgendamentosPage() {
                         Visão geral de todos os agendamentos do sistema.
                     </p>
                 </div>
-                <DialogCancelarPeriodo />
+                <div className="flex items-center gap-3">
+                    <DialogRelatorio />
+                    <DialogCancelarPeriodo />
+                </div>
             </div>
 
             <ListaBloqueios bloqueios={bloqueios} />
