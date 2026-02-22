@@ -14,6 +14,7 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
     Select,
     SelectContent,
@@ -37,10 +38,19 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 const agendarSchema = z.object({
-    motivo: z.enum(["Promoção", "Extravio", "Dano"]),
+    motivo: z.string().min(2, "Selecione um motivo"),
+    motivoPersonalizado: z.string().optional(),
     porIntermedioServico: z.enum(["Sim", "Não"]),
     dataConsulta: z.date(),
     horarioISO: z.string().min(1, "Escolha um horário."),
+}).refine(data => {
+    if (data.motivo === "Outros" && (!data.motivoPersonalizado || data.motivoPersonalizado.length < 3)) {
+        return false;
+    }
+    return true;
+}, {
+    message: "Descreva o motivo (mínimo 3 letras)",
+    path: ["motivoPersonalizado"]
 });
 
 export default function AgendarForm({ perfil }: { perfil: any }) {
@@ -75,9 +85,11 @@ export default function AgendarForm({ perfil }: { perfil: any }) {
         startTransition(async () => {
             const dbDate = new Date(values.horarioISO);
 
+            const motivoFinal = values.motivo === "Outros" ? values.motivoPersonalizado! : values.motivo;
+
             const res = await criarAgendamento({
                 dataHora: dbDate,
-                motivo: values.motivo,
+                motivo: motivoFinal,
                 porIntermedioServico: values.porIntermedioServico === "Sim",
             });
 
@@ -155,7 +167,7 @@ export default function AgendarForm({ perfil }: { perfil: any }) {
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
-                                                        {["Promoção", "Extravio", "Dano"].map((m) => (
+                                                        {["Promoção", "Extravio", "Dano", "Outros"].map((m) => (
                                                             <SelectItem key={m} value={m} className="text-base py-3">
                                                                 {m}
                                                             </SelectItem>
@@ -166,6 +178,21 @@ export default function AgendarForm({ perfil }: { perfil: any }) {
                                             </FormItem>
                                         )}
                                     />
+                                    {form.watch("motivo") === "Outros" && (
+                                        <FormField
+                                            control={form.control}
+                                            name="motivoPersonalizado"
+                                            render={({ field }) => (
+                                                <FormItem className="animate-in fade-in zoom-in-95 duration-200">
+                                                    <FormLabel>Descreva o motivo:</FormLabel>
+                                                    <FormControl>
+                                                        <Input className="h-12 text-base" placeholder="Ex: Mudança de cargo, Roubo em residência..." {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    )}
                                     <FormField
                                         control={form.control}
                                         name="porIntermedioServico"

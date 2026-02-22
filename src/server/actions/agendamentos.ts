@@ -12,7 +12,7 @@ import { ptBR } from "date-fns/locale";
 
 const agendamentoSchema = z.object({
     dataHora: z.date(),
-    motivo: z.enum(["Promoção", "Extravio", "Dano"]),
+    motivo: z.string().min(3, "Insira um motivo válido"),
     porIntermedioServico: z.boolean(),
 });
 

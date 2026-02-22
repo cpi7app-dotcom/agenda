@@ -32,7 +32,7 @@ export const agendamentos = sqliteTable("agendamentos", {
     id: text("id").primaryKey(),
     solicitanteId: text("solicitante_id").notNull(), // Ref to usuarios_info.id
     dataHora: integer("data_hora", { mode: "timestamp" }).notNull(), // Exact timestamp for the 30min slot
-    motivo: text("motivo", { enum: ["Promoção", "Extravio", "Dano"] }).notNull(),
+    motivo: text("motivo").notNull(),
     status: text("status", { enum: ["Agendado", "Cancelado", "Realizado"] })
         .default("Agendado")
         .notNull(),
