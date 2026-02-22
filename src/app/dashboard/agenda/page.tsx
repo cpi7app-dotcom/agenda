@@ -9,6 +9,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { AgendamentoAcoes } from "@/components/agenda/agendamento-acoes";
+import { DialogEncaixe } from "@/components/agenda/dialog-encaixe";
 
 export default async function AgendaPage() {
     const perfil = await getPerfilUsuario();
@@ -25,12 +26,15 @@ export default async function AgendaPage() {
                     <h1 className="text-3xl font-bold tracking-tight text-pm-blue">Troca de Funcional</h1>
                     <p className="text-muted-foreground mt-1">Gerencie e visualize seus agendamentos.</p>
                 </div>
-                <Link href="/dashboard/agendar">
-                    <Button className="bg-pm-blue hover:bg-blue-800 text-white">
-                        <Plus className="mr-2 h-4 w-4" />
-                        Nova Solicitação
-                    </Button>
-                </Link>
+                <div className="flex items-center gap-3">
+                    <DialogEncaixe />
+                    <Link href="/dashboard/agendar">
+                        <Button className="bg-pm-blue hover:bg-blue-800 text-white">
+                            <Plus className="mr-2 h-4 w-4" />
+                            Nova Solicitação
+                        </Button>
+                    </Link>
+                </div>
             </div>
 
             <Card className="shadow-sm">

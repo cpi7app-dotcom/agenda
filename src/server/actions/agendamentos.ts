@@ -61,6 +61,48 @@ export async function criarAgendamento(data: z.infer<typeof agendamentoSchema>) 
     }
 }
 
+export async function criarEncaixe(motivo: string) {
+    try {
+        const { userId } = await auth();
+        if (!userId) return { success: false, message: "Não autorizado" };
+
+        if (!motivo || motivo.length < 2) return { success: false, message: "Informe o motivo do encaixe" };
+
+        const protocolo = "ENC-" + crypto.randomUUID().slice(0, 6).toUpperCase();
+
+        await db.insert(agendamentos).values({
+            id: protocolo,
+            solicitanteId: userId,
+            dataHora: new Date(), // Agora, ignorando restrições de horário
+            motivo,
+            porIntermedioServico: false,
+            status: "Agendado",
+            createdAt: new Date(),
+        });
+
+        revalidatePath("/dashboard/agenda");
+
+        const perfilUsuario = await db.select({
+            email: usuariosInfo.email,
+            nomeGuerra: usuariosInfo.nomeGuerra,
+            postoGraduacao: usuariosInfo.postoGraduacao,
+        }).from(usuariosInfo).where(eq(usuariosInfo.id, userId)).get();
+
+        if (perfilUsuario?.email) {
+            await enviarEmail({
+                para: perfilUsuario.email,
+                assunto: `Encaixe Confirmado - Protocolo ${protocolo}`,
+                corpo: `Olá, ${perfilUsuario.postoGraduacao} ${perfilUsuario.nomeGuerra}!\n\nSeu encaixe foi registrado com sucesso!\n\nProtocolo: ${protocolo}\nMotivo: ${motivo}\n\nComareça imediatamente ao setor com sua documentação.\n\nAtenciosamente,\nCentral de Troca de Funcionais`,
+            });
+        }
+
+        return { success: true, protocolo, message: "Encaixe registrado!" };
+    } catch (error) {
+        console.error(error);
+        return { success: false, message: "Erro ao registrar encaixe" };
+    }
+}
+
 export async function cancelarAgendamento(agendamentoId: string) {
     try {
         const { userId } = await auth();
