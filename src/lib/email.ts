@@ -1,9 +1,5 @@
 import { Resend } from "resend";
 
-// A chave é lida no servidor pelo processo do Next.js
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-// Remetente padrão (plano gratuito Resend)
 const FROM = "Agenda CPI-7 <onboarding@resend.dev>";
 
 export async function enviarEmail({
@@ -16,6 +12,15 @@ export async function enviarEmail({
     corpo: string;
 }) {
     try {
+        const apiKey = process.env.RESEND_API_KEY;
+        if (!apiKey) {
+            console.warn("[EMAIL] RESEND_API_KEY não configurada. E-mail não enviado.");
+            return { success: false };
+        }
+
+        // Instância criada de forma lazy (dentro da função), nunca em tempo de build
+        const resend = new Resend(apiKey);
+
         const { data, error } = await resend.emails.send({
             from: FROM,
             to: [para],
