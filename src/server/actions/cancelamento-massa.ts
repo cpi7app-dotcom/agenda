@@ -2,11 +2,12 @@
 
 import { db } from "@/db";
 import { agendamentos, bloqueios, notificacoes, usuariosInfo } from "@/db/schema";
-import { and, eq, gte, lt } from "drizzle-orm";
+import { and, eq, gte, lt, inArray } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
 import { getPerfilUsuario } from "./perfil";
 import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
+import { enviarEmail } from "@/lib/email";
 
 export async function cancelarPeriodo(
     dataInicio: Date,
@@ -64,10 +65,20 @@ export async function cancelarPeriodo(
                     createdAt: new Date(),
                 });
 
-                // Simulação de Email
-                console.log(`\n[EMAIL SIMULADO] Para: usuário ID ${agnd.solicitanteId}`);
-                console.log(`Assunto: Cancelamento de Agendamento - Protocolo ${agnd.id}`);
-                console.log(`Corpo:\nOlá, ${msg}\n`);
+                // Buscar email do usuário no Clerk para envio de e-mail
+                const usuarioInfo = await db.select({ re: usuariosInfo.re, nomeGuerra: usuariosInfo.nomeGuerra, email: usuariosInfo.email })
+                    .from(usuariosInfo)
+                    .where(eq(usuariosInfo.id, agnd.solicitanteId))
+                    .get();
+
+                // Envia email real via Resend se o usuário tiver e-mail cadastrado
+                if (usuarioInfo?.email) {
+                    await enviarEmail({
+                        para: usuarioInfo.email,
+                        assunto: `Cancelamento de Agendamento - Protocolo ${agnd.id}`,
+                        corpo: `Olá, ${usuarioInfo.nomeGuerra ?? ""}!\n\n${msg}\n\nAtenciosamente,\nCentral de Troca de Funcionais`,
+                    });
+                }
             }
         }
 

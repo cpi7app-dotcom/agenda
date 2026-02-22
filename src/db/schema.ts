@@ -3,6 +3,7 @@ import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 export const usuariosInfo = sqliteTable("usuarios_info", {
     id: text("id").primaryKey(), // ID Clerk Auth
     re: text("re").notNull(), // Ex: "123456"
+    email: text("email"), // E-mail para notificações
     nomeGuerra: text("nome_guerra").notNull(),
     opm: text("opm", {
         enum: [

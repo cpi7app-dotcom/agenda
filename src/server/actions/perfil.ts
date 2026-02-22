@@ -9,6 +9,7 @@ import { revalidatePath } from "next/cache";
 
 const perfilSchema = z.object({
     re: z.string().length(6, "RE deve ter exatamente 6 dígitos"),
+    email: z.string().email().optional().or(z.literal("")),
     postoGraduacao: z.enum([
         "Cel PM", "Ten Cel PM", "Maj PM", "Cap PM",
         "1º Ten PM", "2º Ten PM", "Sub Ten PM",

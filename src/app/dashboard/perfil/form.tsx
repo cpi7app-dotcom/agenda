@@ -57,6 +57,7 @@ const POSTOS = [
 
 const perfilSchema = z.object({
     re: z.string().length(6, "RE deve conter exatamente 6 dígitos numéricos."),
+    email: z.string().email("E-mail inválido.").optional().or(z.literal("")),
     postoGraduacao: z.enum(POSTOS),
     nomeGuerra: z.string().min(2, "Campo obrigatório."),
     opm: z.enum(OPM_LIST),
@@ -70,6 +71,7 @@ export default function PerfilForm({ dadosIniciais }: { dadosIniciais: any }) {
         resolver: zodResolver(perfilSchema),
         defaultValues: {
             re: dadosIniciais?.re || "",
+            email: dadosIniciais?.email || "",
             postoGraduacao: (dadosIniciais?.postoGraduacao as typeof POSTOS[number]) || undefined,
             nomeGuerra: dadosIniciais?.nomeGuerra || "",
             opm: dadosIniciais?.opm || undefined,
@@ -102,6 +104,21 @@ export default function PerfilForm({ dadosIniciais }: { dadosIniciais: any }) {
                                         <FormLabel>Registro (RE)</FormLabel>
                                         <FormControl>
                                             <Input placeholder="Ex: 123456" maxLength={6} {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                        <div className="grid grid-cols-1 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="email"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>E-mail (para notificações)</FormLabel>
+                                        <FormControl>
+                                            <Input type="email" placeholder="seu@email.com" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
