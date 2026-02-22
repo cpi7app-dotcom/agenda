@@ -61,7 +61,7 @@ export async function criarAgendamento(data: z.infer<typeof agendamentoSchema>) 
     }
 }
 
-export async function criarEncaixe(motivo: string) {
+export async function criarEncaixe(motivo: string, porIntermedioServico: boolean = false) {
     try {
         const { userId } = await auth();
         if (!userId) return { success: false, message: "Não autorizado" };
@@ -73,9 +73,9 @@ export async function criarEncaixe(motivo: string) {
         await db.insert(agendamentos).values({
             id: protocolo,
             solicitanteId: userId,
-            dataHora: new Date(), // Agora, ignorando restrições de horário
+            dataHora: new Date(),
             motivo,
-            porIntermedioServico: false,
+            porIntermedioServico,
             status: "Agendado",
             createdAt: new Date(),
         });

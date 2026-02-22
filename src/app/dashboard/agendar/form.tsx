@@ -53,7 +53,7 @@ const agendarSchema = z.object({
     path: ["motivoPersonalizado"]
 });
 
-export default function AgendarForm({ perfil }: { perfil: any }) {
+export default function AgendarForm({ perfil, isEncaixe = false }: { perfil: any; isEncaixe?: boolean }) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
     const [passo, setPasso] = useState(1);
@@ -83,7 +83,7 @@ export default function AgendarForm({ perfil }: { perfil: any }) {
 
     function onSubmit(values: z.infer<typeof agendarSchema>) {
         startTransition(async () => {
-            const dbDate = new Date(values.horarioISO);
+            const dbDate = isEncaixe ? new Date() : new Date(values.horarioISO);
 
             const motivoFinal = values.motivo === "Outros" ? values.motivoPersonalizado! : values.motivo;
 
@@ -219,11 +219,14 @@ export default function AgendarForm({ perfil }: { perfil: any }) {
                                     />
                                     <div className="flex justify-end pt-4">
                                         <Button
-                                            type="button"
-                                            onClick={() => form.trigger(["motivo", "porIntermedioServico"]).then(v => v && setPasso(2))}
+                                            type={isEncaixe ? "submit" : "button"}
+                                            onClick={isEncaixe ? undefined : () => form.trigger(["motivo", "porIntermedioServico"]).then(v => v && setPasso(2))}
                                             className="bg-pm-blue hover:bg-blue-800"
+                                            disabled={isPending}
                                         >
-                                            Avançar
+                                            {isEncaixe
+                                                ? (isPending ? "Registrando Encaixe..." : "⚡ Confirmar Encaixe")
+                                                : "Avançar"}
                                         </Button>
                                     </div>
                                 </div>

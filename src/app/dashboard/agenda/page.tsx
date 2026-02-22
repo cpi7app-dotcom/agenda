@@ -7,9 +7,8 @@ import { getPerfilUsuario } from "@/server/actions/perfil";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Zap } from "lucide-react";
 import { AgendamentoAcoes } from "@/components/agenda/agendamento-acoes";
-import { DialogEncaixe } from "@/components/agenda/dialog-encaixe";
 
 export default async function AgendaPage() {
     const perfil = await getPerfilUsuario();
@@ -27,7 +26,12 @@ export default async function AgendaPage() {
                     <p className="text-muted-foreground mt-1">Gerencie e visualize seus agendamentos.</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <DialogEncaixe />
+                    <Link href="/dashboard/agendar?encaixe=true">
+                        <Button variant="outline" className="border-amber-400 text-amber-600 hover:bg-amber-50 font-semibold">
+                            <Zap className="mr-2 h-4 w-4" />
+                            Encaixe
+                        </Button>
+                    </Link>
                     <Link href="/dashboard/agendar">
                         <Button className="bg-pm-blue hover:bg-blue-800 text-white">
                             <Plus className="mr-2 h-4 w-4" />
