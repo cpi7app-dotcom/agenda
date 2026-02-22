@@ -6,6 +6,9 @@ import { eq, desc } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
+import { enviarEmail } from "@/lib/email";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 const agendamentoSchema = z.object({
     dataHora: z.date(),
@@ -35,6 +38,22 @@ export async function criarAgendamento(data: z.infer<typeof agendamentoSchema>) 
         });
 
         revalidatePath("/dashboard/agenda");
+
+        // Enviar e-mail de confirmação para o usuário
+        const perfilUsuario = await db.select({ email: usuariosInfo.email, nomeGuerra: usuariosInfo.nomeGuerra, postoGraduacao: usuariosInfo.postoGraduacao })
+            .from(usuariosInfo)
+            .where(eq(usuariosInfo.id, userId))
+            .get();
+
+        if (perfilUsuario?.email) {
+            const dataFormatada = format(dataHora, "EEEE, dd/MM/yyyy 'às' HH:mm", { locale: ptBR });
+            await enviarEmail({
+                para: perfilUsuario.email,
+                assunto: `Agendamento Confirmado - Protocolo ${protocolo}`,
+                corpo: `Olá, ${perfilUsuario.postoGraduacao} ${perfilUsuario.nomeGuerra}!\n\nSeu agendamento foi confirmado!\n\nProtocolo: ${protocolo}\nData e Hora: ${dataFormatada}\nMotivo: ${motivo}\n\nMantenha este protocolo para referência. Em caso de dúvidas, entre em contato com a CPI-7.\n\nAtenciosamente,\nCentral de Troca de Funcionais`,
+            });
+        }
+
         return { success: true, protocolo, message: "Agendamento confirmado!" };
     } catch (error) {
         console.error(error);

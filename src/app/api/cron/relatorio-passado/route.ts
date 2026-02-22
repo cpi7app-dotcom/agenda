@@ -3,6 +3,9 @@ import { agendamentos, notificacoes, usuariosInfo } from "@/db/schema";
 import { inArray, and, eq, gte, lt } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { randomUUID } from "crypto";
+import { enviarEmail } from "@/lib/email";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 export const dynamic = "force-dynamic";
 
@@ -55,10 +58,18 @@ export async function GET(req: Request) {
                 createdAt: new Date(),
             });
 
-            // Simulação de Email
-            console.log(`\n[EMAIL CRON] Enviando para: ${admin.postoGraduacao} ${admin.nomeGuerra} (Admin ID: ${admin.id})`);
-            console.log(`Assunto: Fechamento de Agendamentos da Semana`);
-            console.log(`Mensagem: ${mensagem}\n`);
+            // Envia e-mail real via Resend
+            if (admin.email) {
+                const listaFormatada = realizados.map(r =>
+                    `- ${r.postoGraduacao ?? ""} ${r.nomeGuerra ?? ""} | ${format(new Date(r.dataHora), "EEE dd/MM HH:mm", { locale: ptBR })} | ${r.motivo}`
+                ).join("\n");
+
+                await enviarEmail({
+                    para: admin.email,
+                    assunto: `Relatório: Fechamento de Trocas da Semana Passada`,
+                    corpo: `Olá, ${admin.postoGraduacao} ${admin.nomeGuerra}!\n\n${mensagem}\n\n${realizados.length > 0 ? listaFormatada : "Nenhuma troca realizada na semana."}\n\nAcesse o painel para mais detalhes.\n\nAtenciosamente,\nSistema de Troca de Funcionais`,
+                });
+            }
         }
 
         return NextResponse.json({ success: true, count: realizados.length, message: "Relatório Passado gerado." });
