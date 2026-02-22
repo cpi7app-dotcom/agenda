@@ -20,6 +20,7 @@ export const usuariosInfo = sqliteTable("usuarios_info", {
             "55 BPM-I",
         ],
     }).notNull(),
+    numeroOficioSei: text("numero_oficio_sei").default("Sem ofício").notNull(),
     role: text("role", { enum: ["user", "admin_p5", "admin_central"] })
         .default("user")
         .notNull(),

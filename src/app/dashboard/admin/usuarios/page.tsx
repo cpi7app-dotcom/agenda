@@ -63,7 +63,7 @@ export default async function AdminUsuariosPage(
                                         {usuario.postoGraduacao} {usuario.nomeGuerra}
                                     </p>
                                     <p className="text-sm text-slate-500">
-                                        RE: {usuario.re} &middot; {usuario.opm}
+                                        RE: {usuario.re} &middot; {usuario.opm} &middot; SEI: {usuario.numeroOficioSei}
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-3">

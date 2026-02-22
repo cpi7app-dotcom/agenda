@@ -54,7 +54,7 @@ export default async function AdminAgendamentosPage() {
                             <Table>
                                 <TableHeader className="bg-slate-50">
                                     <TableRow>
-                                        <TableHead>Protocolo</TableHead>
+                                        <TableHead>Protocolo / SEI</TableHead>
                                         <TableHead>Solicitante</TableHead>
                                         <TableHead>Data/Hora</TableHead>
                                         <TableHead>Motivo</TableHead>
@@ -65,7 +65,12 @@ export default async function AdminAgendamentosPage() {
                                 <TableBody>
                                     {agendamentos.map((a) => (
                                         <TableRow key={a.id} className="hover:bg-slate-50/50">
-                                            <TableCell className="font-mono text-xs">{a.id}</TableCell>
+                                            <TableCell className="font-mono text-xs">
+                                                <div className="font-bold">{a.id}</div>
+                                                <div className="text-muted-foreground mt-0.5" title="Ofício SEI">
+                                                    {a.numeroOficioSei || "Sem ofício"}
+                                                </div>
+                                            </TableCell>
                                             <TableCell className="text-xs text-slate-500">{a.solicitanteId.slice(0, 14)}...</TableCell>
                                             <TableCell className="font-medium">
                                                 {format(new Date(a.dataHora), "dd/MM/yyyy HH:mm")}

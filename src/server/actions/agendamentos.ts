@@ -99,6 +99,7 @@ export type AgendamentoComPerfil = {
     solicitanteId: string;
     postoGraduacao: string | null;
     nomeGuerra: string | null;
+    numeroOficioSei: string | null;
 };
 
 export async function getAgendamentos(): Promise<AgendamentoComPerfil[]> {
@@ -127,6 +128,7 @@ export async function getAgendamentos(): Promise<AgendamentoComPerfil[]> {
                 solicitanteId: agendamentos.solicitanteId,
                 postoGraduacao: usuariosInfo.postoGraduacao,
                 nomeGuerra: usuariosInfo.nomeGuerra,
+                numeroOficioSei: usuariosInfo.numeroOficioSei,
             })
             .from(agendamentos)
             .leftJoin(usuariosInfo, eq(agendamentos.solicitanteId, usuariosInfo.id))
